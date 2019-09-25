@@ -196,8 +196,6 @@ class MLPPolicyPG(MLPPolicy):
         # Take negative log likelihood weighted by advantage. 
         # TODO is this advantage actually computed already or do we compute it ourselves?? 
         self.loss = - self.logprob_n * self.adv_n
-        print(self.loss.shape)
-        exit()
         self.loss = tf.reduce_sum(self.loss) # TODO get shape right. 
 
         # TODO: define what exactly the optimizer should minimize when updating the policy
