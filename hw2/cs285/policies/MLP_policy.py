@@ -206,13 +206,10 @@ class MLPPolicyPG(MLPPolicy):
             # HINT1: use tf.losses.mean_squared_error, similar to SL loss from hw1
             # HINT2: we want predictions (self.baseline_prediction) to be as close as possible to the labels (self.targets_n)
                 # see 'update' function below if you don't understand what's inside self.targets_n
-            print(self.targets_n.shape)
-            print(self.baseline_prediction.shape)
-            exit() # TODO Make sure shape is correct. 
             self.baseline_loss = tf.losses.mean_squared_error(self.targets_n, self.baseline_prediction)
 
             # TODO: define what exactly the optimizer should minimize when updating the baseline
-            self.baseline_update_op = tf.train.AdamOptimizer(self.learning_rate).minimize(baseline_loss)
+            self.baseline_update_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.baseline_loss)
 
     #########################
 
@@ -228,7 +225,7 @@ class MLPPolicyPG(MLPPolicy):
             observation = obs[None]
 
         feed_dict = {self.observations_pl: observation}
-        baseline_pred = sess.run(self.baseline_prediction, feed_dict=feed_dict)
+        baseline_pred = self.sess.run(self.baseline_prediction, feed_dict=feed_dict)
 
         return baseline_pred
 
@@ -241,7 +238,8 @@ class MLPPolicyPG(MLPPolicy):
             targets_n = (qvals - np.mean(qvals))/(np.std(qvals)+1e-8)
             # TODO: update the nn baseline with the targets_n
             # HINT1: run an op that you built in define_train_op
-            _, baseline_loss = self.sess.run([self.baseline_update_op, self.baseline_loss], feed_dict={self.observations_pl: observations})
+            feed_dict = {self.observations_pl: observations, self.targets_n: qvals}
+            _, baseline_loss = self.sess.run([self.baseline_update_op, self.baseline_loss], feed_dict=feed_dict)
 
         return loss
 
