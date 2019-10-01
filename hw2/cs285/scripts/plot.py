@@ -129,10 +129,18 @@ def p7():
             if results == search_results: 
                 name = '_'.join(os.path.basename(r_dir).split('_')[2:4])
             elif results == final_results: 
-                name = '_'.join(os.path.basename(r_dir).split('Half')[0].split('_')[4:])
-            
+                name = os.path.basename(r_dir).split('Half')[0].split('_')[-1]
+
+                if name == '1':
+                    name = 'no_rtg_no_baseline'
+                elif name == '2':
+                    name = 'rtg'
+                elif name == '3':
+                    name = 'baseline'
+                elif name == '4':
+                    name = 'rtg_baseline'
+
             name = name.strip('_')
-            if len(name) == 0: name = 'no_rtg_no_baseline'
             legend.append(name)
 
             # Plot result. 
