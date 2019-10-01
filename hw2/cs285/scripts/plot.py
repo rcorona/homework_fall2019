@@ -5,6 +5,7 @@ from glob import glob
 import os
 import tensorflow as tf
 import numpy as np
+import argparse
 
 # From Piazza post @85. 
 def parse_tf_events_file(filename):
@@ -16,30 +17,150 @@ def parse_tf_events_file(filename):
 
     return eval_returns
 
-def p7(): 
+def parse_args(): 
+
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('-file_prefix', type=str, help='Prefix for file paths to read in for results.')
+    parser.add_argument('-problem', type=int, help='Problem number to plot')
+
+    return parser.parse_args()
+
+def p3(): 
 
     data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../data')
-    results = glob(os.path.join(data_path, '*HalfCheetah*'))
-    
-    # Will hold legend labels. 
+    sb_results = glob(os.path.join(data_path, 'pg_sb*')) 
+    lb_results = glob(os.path.join(data_path, 'pg_lb*'))
+
+    for results in (sb_results, lb_results): 
+
+        legend = []
+
+        for r_dir in results: 
+            
+            # First get experiment results from tf events file. 
+            tf_path = glob(os.path.join(r_dir, 'events.out.tfevents*'))[0]
+            avg_return = np.asarray(parse_tf_events_file(tf_path), dtype=np.float32)
+
+            # Extract experiment name for legend. 
+            name = '_'.join(os.path.basename(r_dir).split('_Cart')[0].split('_')[2:])
+            legend.append(name)
+
+            # Plot result. 
+            plt.plot(np.arange(len(avg_return)), avg_return)
+
+        # Save figure. 
+        plt.legend(legend)
+        plt.xlabel('Iteration')
+        plt.ylabel('Avg. Return')
+
+        if results == sb_results:
+            f_name = 'sb'
+        else: 
+            f_name = 'lb'
+
+        plt.title('Cart Pole {}'.format(f_name.upper()))
+        plt.savefig('p3_{}.png'.format(f_name))
+        plt.close()
+
+def p4(): 
+
+    data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../data')
+    results = glob(os.path.join(data_path, 'pg_ip*v2_28*'))
     legend = []
 
     for r_dir in results: 
-        
+
         # First get experiment results from tf events file. 
         tf_path = glob(os.path.join(r_dir, 'events.out.tfevents*'))[0]
         avg_return = np.asarray(parse_tf_events_file(tf_path), dtype=np.float32)
 
         # Extract experiment name for legend. 
-        name = '_'.join(os.path.basename(r_dir).split('_')[2:4])
-        legend.append(name)
+        batch, lr = os.path.basename(r_dir).split('_')[2:4]
 
         # Plot result. 
         plt.plot(np.arange(len(avg_return)), avg_return)
 
-    # Make legend. 
-    plt.legend(legend)
-    plt.savefig('test_fig.png')
+    # Save figure. 
+    plt.title('Inverted Pendulum -- Batch: {}, LR: {}'.format(batch, lr))
+    plt.xlabel('Iteration')
+    plt.ylabel('Avg. Return')
+    plt.savefig('p4.png')
+    plt.close()
+
+def p6(): 
+
+    data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../data')
+    results = glob(os.path.join(data_path, 'pg_ll*'))
+
+    for r_dir in results: 
+
+        # First get experiment results from tf events file. 
+        tf_path = glob(os.path.join(r_dir, 'events.out.tfevents*'))[0]
+        avg_return = np.asarray(parse_tf_events_file(tf_path), dtype=np.float32)
+
+        # Plot result. 
+        plt.plot(np.arange(len(avg_return)), avg_return)
+
+    # Save figure. 
+    plt.title('Lunar Lander')
+    plt.xlabel('Iteration')
+    plt.ylabel('Avg. Return')
+    plt.savefig('p6.png')
+    plt.close()
+
+def p7(): 
+
+    data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../data')
+    search_results = glob(os.path.join(data_path, 'pg_hc_*nnbaseline*'))
+    final_results = glob(os.path.join(data_path, 'pg_hc_b30000_r0.02*'))
+
+    for results in (search_results, final_results): 
+
+        legend = []
+        
+        for r_dir in results: 
+            
+            # First get experiment results from tf events file. 
+            tf_path = glob(os.path.join(r_dir, 'events.out.tfevents*'))[0]
+            avg_return = np.asarray(parse_tf_events_file(tf_path), dtype=np.float32)
+
+            # Extract experiment name for legend. 
+            if results == search_results: 
+                name = '_'.join(os.path.basename(r_dir).split('_')[2:4])
+            elif results == final_results: 
+                name = '_'.join(os.path.basename(r_dir).split('Half')[0].split('_')[4:])
+            
+            name = name.strip('_')
+            if len(name) == 0: name = 'no_rtg_no_baseline'
+            legend.append(name)
+
+            # Plot result. 
+            plt.plot(np.arange(len(avg_return)), avg_return)
+
+        # Make legend. 
+        plt.xlabel('Iteration')
+        plt.ylabel('Avg. Return')
+        plt.legend(legend)
+
+        if results == search_results: 
+            plt.title('Half-Cheetah Grid Search') 
+            plt.savefig('p7_search.png')
+        elif results == final_results:
+            plt.title('Half-Cheetah Batch: {}, LR: {}'.format(30000, 0.02))
+            plt.savefig('p7_results.png')
+
+        plt.close()
 
 if __name__ == '__main__':
-    p7()
+    
+    args = parse_args()
+
+    if args.problem == 3: 
+        p3()
+    elif args.problem == 4: 
+        p4()
+    elif args.problem == 6:
+        p6()
+    elif args.problem == 7: 
+        p7()
