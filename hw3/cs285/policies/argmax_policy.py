@@ -22,4 +22,4 @@ class ArgMaxPolicy(object):
 
         feed_dict = {self.critic.obs_t_ph: observation}
 
-        return sess.run(self.action, feed_dict=feed_dict)
+        return self.sess.run(self.action, feed_dict=feed_dict)
