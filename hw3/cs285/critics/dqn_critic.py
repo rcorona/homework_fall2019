@@ -43,9 +43,12 @@ class DQNCritic(BaseCritic):
             # is being updated, but the Q-value for this action is obtained from the
             # target Q-network. See page 5 of https://arxiv.org/pdf/1509.06461.pdf for more details.
             self.q_tp1_values = q_func(self.obs_tp1_ph, self.ac_dim, scope='q_func', reuse=True)
-            actions = tf.argmax(self.q_tp1_values, axis=1)
 
-            q_tp1 = tf.gather(q_tp1_values, actions, axis=1)
+            actions = tf.argmax(self.q_tp1_values, axis=1)
+            row_idx = tf.range(tf.shape(actions)[0])
+            idx = tf.stack([row_idx, tf.cast(actions, tf.int32)], axis=1)
+
+            q_tp1 = tf.gather_nd(q_tp1_values, idx)
         else:
             # q values of the next timestep
             q_tp1 = tf.reduce_max(q_tp1_values, axis=1)

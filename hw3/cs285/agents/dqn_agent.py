@@ -124,6 +124,10 @@ class DQNAgent(object):
             }
             # TODO Is terminal_n correct to place here? 
 
+            #test = self.sess.run(self.critic.q_tp1, feed_dict={self.critic.obs_tp1_ph: next_ob_no})
+            #print(test.shape)
+            #exit()
+
             # TODO: create a LIST of tensors to run in order to 
             # train the critic as well as get the resulting total_error
             tensors_to_run = [self.critic.total_error, self.critic.train_fn]
@@ -132,7 +136,6 @@ class DQNAgent(object):
             # created to compute the Bellman error in a batch, 
             # and the critic's train function performs a gradient step 
             # and update the network parameters to reduce that total_error.
-
             # TODO: use sess.run to periodically update the critic's target function
             # HINT: see update_target_fn
             if self.num_param_updates % self.target_update_freq == 0:
