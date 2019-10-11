@@ -16,7 +16,7 @@ class DQNAgent(object):
         self.last_obs = self.env.reset()
 
         self.num_actions = agent_params['ac_dim']
-        self.learning_starts = 10#agent_params['learning_starts']
+        self.learning_starts = agent_params['learning_starts']
         self.learning_freq = agent_params['learning_freq']
         self.target_update_freq = agent_params['target_update_freq']
 
