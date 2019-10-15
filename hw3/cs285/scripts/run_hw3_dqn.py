@@ -49,6 +49,7 @@ def main():
     parser.add_argument('--exp_name', type=str, default='todo')
 
     parser.add_argument('--eval_batch_size', type=int, default=1000)
+    #parser.add_argument('--learning_rate', type=float, defaul.
 
     parser.add_argument('--batch_size', type=int, default=32)
     parser.add_argument('--num_agent_train_steps_per_iter', type=int, default=1)

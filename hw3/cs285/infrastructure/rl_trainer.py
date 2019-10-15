@@ -33,6 +33,7 @@ class RL_Trainer(object):
         self.params = params
         self.logger = Logger(self.params['logdir'])
         self.sess = create_tf_session(self.params['use_gpu'], which_gpu=self.params['which_gpu'])
+        self.log_video = False# TODO ?? 
 
         # Set random seeds
         seed = self.params['seed']
