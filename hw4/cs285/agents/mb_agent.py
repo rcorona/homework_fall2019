@@ -43,17 +43,27 @@ class MBAgent(BaseAgent):
         num_data = ob_no.shape[0]
         num_data_per_ens = int(num_data/self.ensemble_size)
 
+        # Keep sampled batch idx for each ensemble member. # TODO Is this correct?? 
+        batch_idx = np.arange(num_data) 
+        np.random.shuffle(batch_idx)
+
         for i in range(self.ensemble_size):
             
             # select which datapoints to use for this model of the ensemble
             # you might find the num_data_per_env variable defined above useful
 
-            observations = # TODO(Q1)
-            actions = # TODO(Q1)
-            next_observations = # TODO(Q1)
+            # TODO Check shapes of things. 
+            start = i*num_data_per_ens
+            end = (i + 1) * num_data_per_ens 
+
+            exit('Check shapes of things mb_agents.py')
+
+            observations = tf.gather(ob_no, batch_idx[start:end], axis=0)  
+            actions = tf.gather(ac_na, batch_idx[start:end], axis=0)
+            next_observations = tf.gather(next_ob_no, batch_idx[start:end], axis=0)
 
             # use datapoints to update one of the dyn_models
-            model =  # TODO(Q1)
+            model =  self.dyn_models[i]
             loss = model.update(observations, actions, next_observations, self.data_statistics)
             losses.append(loss)
 
