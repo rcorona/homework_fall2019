@@ -56,11 +56,9 @@ class MBAgent(BaseAgent):
             start = i*num_data_per_ens
             end = (i + 1) * num_data_per_ens 
 
-            exit('Check shapes of things mb_agents.py')
-
-            observations = tf.gather(ob_no, batch_idx[start:end], axis=0)  
-            actions = tf.gather(ac_na, batch_idx[start:end], axis=0)
-            next_observations = tf.gather(next_ob_no, batch_idx[start:end], axis=0)
+            observations = ob_no[batch_idx[start:end]]
+            actions = ac_na[batch_idx[start:end]]
+            next_observations = next_ob_no[batch_idx[start:end]]
 
             # use datapoints to update one of the dyn_models
             model =  self.dyn_models[i]
@@ -68,7 +66,7 @@ class MBAgent(BaseAgent):
             losses.append(loss)
 
         avg_loss = np.mean(losses)
-        return avg_loss
+        return losses#avg_loss
 
     def add_to_replay_buffer(self, paths, add_sl_noise=False):
 

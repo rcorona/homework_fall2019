@@ -1,4 +1,4 @@
-import tensorflow as tf
+105ggimport tensorflow as tf
 
 from .base_model import BaseModel
 from cs285.infrastructure.utils import normalize, unnormalize
@@ -74,14 +74,15 @@ class FFModel(BaseModel):
         # normalize the labels
 
         # TODO(Q1) Define a normalized version of delta_labels using self.delta_labels (which are unnormalized), and self.delta_mean_pl and self.delta_std_pl
-        self.delta_labels_normalized = normalize(self.delta_labels, self.delta_mean_pl, self.delta_std)
+        self.delta_labels_normalized = normalize(self.delta_labels, self.delta_mean_pl, self.delta_std_pl)
 
         # compared predicted deltas to labels (both should be normalized)
-        
+            
         # TODO(Q1) Define a loss function that takes as input normalized versions of predicted change in state and ground truth change in state
-        self.loss = tf.losses.mean_squared_error(self.delta_labels_normalized, # TODO Is this the right loss???
-        
-        self.train_op = # TODO(Q1) Define a train_op to minimize the loss defined above. Adam optimizer will work well.
+        self.loss = tf.losses.mean_squared_error(self.delta_labels_normalized, self.delta_pred_normalized)# TODO Is this the right loss???
+       
+        # TODO(Q1) Define a train_op to minimize the loss defined above. Adam optimizer will work well.
+        self.train_op = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
 
     #############################
 
@@ -92,9 +93,28 @@ class FFModel(BaseModel):
         else:
             observations = obs[None]
             actions = acs [None]
-        return # TODO(Q1) Run model prediction on the given batch of data
+        
+        # TODO(Q1) Run model prediction on the given batch of data
+        feed_dict = {
+                self.obs_pl: obs, self.acs_pl: acs,
+                self.obs_mean_pl: data_statistics['obs_mean'], self.obs_std_pl: data_statistics['obs_std'],  
+                self.acs_mean_pl: data_statistics['acs_mean'], self.acs_std_pl: data_statistics['acs_std'], 
+                self.delta_mean_pl: data_statistics['delta_mean'], self.delta_std_pl: data_statistics['delta_std']
+        }
+        
+        return self.sess.run(self.next_obs_pred, feed_dict=feed_dict)
 
     def update(self, observations, actions, next_observations, data_statistics):
+   
         # train the model
-        _, loss = # TODO(Q1) Run the defined train_op here, and also return the loss being optimized (on this batch of data)
+        feed_dict = {
+                self.obs_pl: observations, self.acs_pl: actions, self.delta_labels: next_observations - observations,
+                self.obs_mean_pl: data_statistics['obs_mean'], self.obs_std_pl: data_statistics['obs_std'],  
+                self.acs_mean_pl: data_statistics['acs_mean'], self.acs_std_pl: data_statistics['acs_std'], 
+                self.delta_mean_pl: data_statistics['delta_mean'], self.delta_std_pl: data_statistics['delta_std']
+        }
+              
+        # TODO(Q1) Run the defined train_op here, and also return the loss being optimized (on this batch of data)
+        _, loss = self.sess.run([self.train_op, self.loss], feed_dict=feed_dict)
+        
         return loss
