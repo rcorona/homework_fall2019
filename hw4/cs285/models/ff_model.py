@@ -1,4 +1,4 @@
-105ggimport tensorflow as tf
+import tensorflow as tf
 
 from .base_model import BaseModel
 from cs285.infrastructure.utils import normalize, unnormalize
