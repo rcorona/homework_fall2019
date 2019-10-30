@@ -232,6 +232,8 @@ class RL_Trainer(object):
     def train_agent(self):
         # TODO: GETTHIS from HW1
 
+        all_losses = []
+
         print('\nTraining agent using sampled data from replay buffer...')
         for train_step in range(self.params['num_agent_train_steps_per_iter']):
 
@@ -244,8 +246,9 @@ class RL_Trainer(object):
             # HINT: use the agent's train function
             # HINT: print or plot the loss for debugging!
             loss = self.agent.train(ob_batch, ac_batch, re_batch, next_ob_batch, terminal_batch)
+            all_losses.append(loss)
 
-        return loss
+        return all_losses
 
     def do_relabel_with_expert(self, expert_policy, paths):
         # TODO: GETTHIS from HW1 (although you don't actually need it for this homework)

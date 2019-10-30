@@ -57,27 +57,21 @@ class MPCPolicy(BasePolicy):
             # once you have a sequence of predicted states from each model in your
             # ensemble, calculate the reward for each sequence using self.env.get_reward(predicted_obs)
             predicted_rewards = []
+            obs_pl = np.tile(np.reshape(obs, [1, -1]), (len(candidate_action_sequences), 1))
 
-            for candidate in candidate_action_sequences: 
+            for i in range(candidate_action_sequences.shape[1]):
+                acs = candidate_action_sequences[:,i]
+                obs_pl = model.get_prediction(obs_pl, acs, self.data_statistics)
                 
-                predicted_obs = []
-                obs_pl = obs
-
-                for acs in candidate:
-                    obs_pl = model.get_prediction(np.reshape(obs_pl, [1,-1]), np.reshape(acs, [1,-1]), self.data_statistics)
-                    predicted_obs.append(obs_pl)
-
-                predicted_obs = np.concatenate(predicted_obs)
-                rewards, _ = self.env.get_reward(predicted_obs, candidate)
-
-                predicted_rewards.append(sum(rewards))
+                rewards, _ = self.env.get_reward(obs_pl, acs)
+                predicted_rewards.append(rewards)
 
             predicted_rewards = np.asarray(predicted_rewards)
-            predicted_rewards = np.reshape(predicted_rewards, [1, -1])
+            predicted_rewards = np.sum(predicted_rewards, 1)
             predicted_rewards_per_ens.append(predicted_rewards)
 
-        predicted_rewards_per_ens = np.concatenate(predicted_rewards_per_ens)
-        
+        predicted_rewards_per_ens = np.asarray(predicted_rewards_per_ens)
+
         # calculate mean_across_ensembles(predicted rewards).
         # the matrix dimensions should change as follows: [ens,N] --> N
         

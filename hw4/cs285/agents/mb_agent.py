@@ -66,7 +66,7 @@ class MBAgent(BaseAgent):
             losses.append(loss)
 
         avg_loss = np.mean(losses)
-        return losses#avg_loss
+        return avg_loss
 
     def add_to_replay_buffer(self, paths, add_sl_noise=False):
 
