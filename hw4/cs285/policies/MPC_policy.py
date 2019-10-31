@@ -67,7 +67,7 @@ class MPCPolicy(BasePolicy):
                 predicted_rewards.append(rewards)
 
             predicted_rewards = np.asarray(predicted_rewards)
-            predicted_rewards = np.sum(predicted_rewards, 1)
+            predicted_rewards = np.sum(predicted_rewards, 0)
             predicted_rewards_per_ens.append(predicted_rewards)
 
         predicted_rewards_per_ens = np.asarray(predicted_rewards_per_ens)
@@ -81,5 +81,5 @@ class MPCPolicy(BasePolicy):
         # pick the action sequence and return the 1st element of that sequence
         best_index = np.argmax(predicted_rewards_per_ens)  #TODO(Q2)
         best_action_sequence = candidate_action_sequences[best_index] #TODO(Q2)
-        action_to_take = candidate_action_sequences[best_index][0] # TODO(Q2)
+        action_to_take = best_action_sequence[0] # TODO(Q2)
         return action_to_take[None] # the None is for matching expected dimensions
