@@ -50,43 +50,58 @@ def p2():
     plt.savefig('q2.png')
     plt.close()
 
-def q3():
-    
-    data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../data/*PongNoFrameskip*')
-    data_path = glob(os.path.join(data_path, 'events.out.tfevents*'))
+def p3():
 
-    legend = []
-    l = 600
+    # Obstacles. 
+    data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../data/*obstacles_obstacles*31-10*35-21*')
+    data_path = glob(os.path.join(data_path, 'events.out.tfevents*'))[0]
 
-    for hparam in data_path: 
+    eval_avg = parse_tf_events_file(data_path, 'Eval_AverageReturn')
 
-        # Get return values. 
-        avg_returns = np.asarray(parse_tf_events_file(hparam, 'Train_AverageReturn'), dtype=np.float32)[:l]
-
-        # Plot result. 
-        timesteps = np.asarray(parse_tf_events_file(hparam, 'Train_EnvstepsSoFar'), dtype=np.int32)[:l]
-        plt.plot(timesteps, avg_returns)
-
-        name = hparam.split('/')[9]
-        
-        if 'hparam1' in name: 
-            name = '2'
-        elif 'hparam2' in name: 
-            name = '8'
-        elif 'q1' in name:
-            name = '32'
-        elif 'hparam3' in name:
-            name = '128'
-
-        legend.append(name)
+    # Plot result. 
+    plt.plot(np.arange(len(eval_avg)), eval_avg)
 
     # Save figure. 
-    plt.legend(legend)
-    plt.xlabel('Timesteps')
+    plt.xlabel('Iterations')
+    plt.ylabel('Average Return')
+    plt.ylim([-50.0, -20.0])
+
+    plt.title('Obstacles Q3')
+    plt.savefig('q3_obstacles.png')
+    plt.close()
+
+    # Reacher. 
+    data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../data/*reacher_reacher*31-10*')
+    data_path = glob(os.path.join(data_path, 'events.out.tfevents*'))[0]
+
+    eval_avg = parse_tf_events_file(data_path, 'Eval_AverageReturn')
+
+    # Plot result. 
+    plt.plot(np.arange(len(eval_avg)), eval_avg)
+
+    # Save figure. 
+    plt.xlabel('Iterations')
     plt.ylabel('Average Return')
 
-    plt.title('Pong Q3 Batch Size Comparison')
-    plt.savefig('q3.png')
+    plt.title('Reacher Q3')
+    plt.savefig('q3_reacher.png')
+    plt.close()
+
+    # Half-Cheetah. 
+    data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../data/*cheetah_cheetah*31-10*')
+    data_path = glob(os.path.join(data_path, 'events.out.tfevents*'))[0]
+
+    eval_avg = parse_tf_events_file(data_path, 'Eval_AverageReturn')
+
+    # Plot result. 
+    plt.plot(np.arange(len(eval_avg)), eval_avg)
+
+    # Save figure. 
+    plt.xlabel('Iterations')
+    plt.ylabel('Average Return')
+
+    plt.title('Cheetah Q3')
+    plt.savefig('q3_cheetah.png')
     plt.close()
 
 def q4(): 
