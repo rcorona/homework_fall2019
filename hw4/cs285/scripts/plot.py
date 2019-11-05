@@ -104,63 +104,33 @@ def p3():
     plt.savefig('q3_cheetah.png')
     plt.close()
 
-def q4(): 
+def p4(): 
 
-    data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../data/ac_*CartPole*')
+    # Ensemble size. 
+    data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../data/mb_q5_reacher_ensemble*31-10-2019*')
     data_path = glob(os.path.join(data_path, 'events.out.tfevents*'))
 
     legend = []
 
     for path in data_path: 
 
-        # Get return values. 
-        avg_return = np.asarray(parse_tf_events_file(path, 'Train_AverageReturn'), dtype=np.float32) 
-        timesteps = np.asarray(parse_tf_events_file(path, 'Train_EnvstepsSoFar'), dtype=np.int32)
-        
-        plt.plot(timesteps, avg_return)
+        eval_avg = parse_tf_events_file(path, 'Eval_AverageReturn')
 
-        ntu, ngsptu = path.split('ac')[1].split('_')[1:3]
-        legend.append('ntu: {} ngsptu: {}'.format(ntu, ngsptu))
+        # Plot result. 
+        plt.plot(np.arange(len(eval_avg)), eval_avg)
+
+        # Extract name for legend. 
+        name = path.split('/')[-2].split('_')[3].split('ensemble')[-1]
+        
+        legend.append(name)
 
     # Save figure. 
+    plt.xlabel('Iterations')
+    plt.ylabel('Average Return')
     plt.legend(legend)
-    plt.xlabel('Timesteps')
-    plt.ylabel('Average Return')
 
-    plt.title('Cart Pole Q4')
-    plt.savefig('q4.png')
-    plt.close()
-
-def q5(): 
-
-    ip_data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../data/*InvertedPendulum*')
-    ip_data_path = glob(os.path.join(ip_data_path, 'events.out.tfevents*'))[0]
-
-    hc_data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../data/*HalfCheetah*')
-    hc_data_path = glob(os.path.join(hc_data_path, 'events.out.tfevents*'))[0]
-
-    # Get return values. 
-    ip_avg_returns = np.asarray(parse_tf_events_file(ip_data_path, 'Train_AverageReturn'), dtype=np.float32)
-    hc_avg_returns = np.asarray(parse_tf_events_file(hc_data_path, 'Train_AverageReturn'), dtype=np.float32)
-
-    ip_timesteps = np.asarray(parse_tf_events_file(ip_data_path, 'Train_EnvstepsSoFar'), dtype=np.int32)
-    hc_timesteps = np.asarray(parse_tf_events_file(hc_data_path, 'Train_EnvstepsSoFar'), dtype=np.int32)
-
-    # Plot results.
-    plt.plot(ip_timesteps, ip_avg_returns)
-    plt.xlabel('Timesteps')
-    plt.ylabel('Average Return')
-
-    plt.title('Inverted Pendulum Q5')
-    plt.savefig('q5_ip.png')
-    plt.close()
-
-    plt.plot(hc_timesteps, hc_avg_returns)
-    plt.xlabel('Timesteps')
-    plt.ylabel('Average Return')
-
-    plt.title('Half Cheetah Q5')
-    plt.savefig('q5_hc.png')
+    plt.title('Reacher Q4 Ensemble Size Comparison')
+    plt.savefig('q4_ensemble.png')
     plt.close()
 
 if __name__ == '__main__':
