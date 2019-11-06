@@ -133,6 +133,60 @@ def p4():
     plt.savefig('q4_ensemble.png')
     plt.close()
 
+    # Number of action sequences. 
+    data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../data/mb_q5_reacher_numseq*31-10-2019*')
+    data_path = glob(os.path.join(data_path, 'events.out.tfevents*'))
+
+    legend = []
+
+    for path in data_path: 
+
+        eval_avg = parse_tf_events_file(path, 'Eval_AverageReturn')
+
+        # Plot result. 
+        plt.plot(np.arange(len(eval_avg)), eval_avg)
+
+        # Extract name for legend. 
+        name = path.split('/')[-2].split('_')[3].split('numseq')[-1]
+        
+        legend.append(name)
+
+    # Save figure. 
+    plt.xlabel('Iterations')
+    plt.ylabel('Average Return')
+    plt.legend(legend)
+
+    plt.title('Reacher Q4 Num Action Sequence Comparison')
+    plt.savefig('q4_numseq.png')
+    plt.close()
+
+    # Number of candidate action sequences. 
+    data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../data/mb_q5_reacher_horizon*31-10-2019*')
+    data_path = glob(os.path.join(data_path, 'events.out.tfevents*'))
+
+    legend = []
+
+    for path in data_path: 
+
+        eval_avg = parse_tf_events_file(path, 'Eval_AverageReturn')
+
+        # Plot result. 
+        plt.plot(np.arange(len(eval_avg)), eval_avg)
+
+        # Extract name for legend. 
+        name = path.split('/')[-2].split('_')[3].split('horizon')[-1]
+        
+        legend.append(name)
+
+    # Save figure. 
+    plt.xlabel('Iterations')
+    plt.ylabel('Average Return')
+    plt.legend(legend)
+
+    plt.title('Reacher Q4 Planning Horizon Comparison')
+    plt.savefig('q4_horizon.png')
+    plt.close()
+
 if __name__ == '__main__':
     
     args = parse_args()
