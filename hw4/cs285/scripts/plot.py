@@ -26,12 +26,13 @@ def parse_args():
 
     parser.add_argument('-file_prefix', type=str, help='Prefix for file paths to read in for results.')
     parser.add_argument('-problem', type=int, help='Problem number to plot')
+    parser.add_argument('-data_path', type=str, help='Path to where run logs are held')
 
     return parser.parse_args()
 
-def p2(): 
+def p2(args): 
 
-    data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../data/*obstacles_singleiteration*31-10*')
+    data_path = os.path.join(args.data_path, '*obstacles_singleiteration*31-10*')
     data_path = glob(os.path.join(data_path, 'events.out.tfevents*'))[0]
 
     train_avg = parse_tf_events_file(data_path, 'Train_AverageReturn')
@@ -50,10 +51,10 @@ def p2():
     plt.savefig('q2.png')
     plt.close()
 
-def p3():
+def p3(args):
 
     # Obstacles. 
-    data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../data/*obstacles_obstacles*31-10*35-21*')
+    data_path = os.path.join(args.data_path, '*obstacles_obstacles*31-10*35-21*')
     data_path = glob(os.path.join(data_path, 'events.out.tfevents*'))[0]
 
     eval_avg = parse_tf_events_file(data_path, 'Eval_AverageReturn')
@@ -71,7 +72,7 @@ def p3():
     plt.close()
 
     # Reacher. 
-    data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../data/*reacher_reacher*31-10*')
+    data_path = os.path.join(args.data_path, '*reacher_reacher*31-10*')
     data_path = glob(os.path.join(data_path, 'events.out.tfevents*'))[0]
 
     eval_avg = parse_tf_events_file(data_path, 'Eval_AverageReturn')
@@ -88,7 +89,7 @@ def p3():
     plt.close()
 
     # Half-Cheetah. 
-    data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../data/*cheetah_cheetah*31-10*')
+    data_path = os.path.join(args.data_path, '*cheetah_cheetah*31-10*')
     data_path = glob(os.path.join(data_path, 'events.out.tfevents*'))[0]
 
     eval_avg = parse_tf_events_file(data_path, 'Eval_AverageReturn')
@@ -104,10 +105,10 @@ def p3():
     plt.savefig('q3_cheetah.png')
     plt.close()
 
-def p4(): 
+def p4(args): 
 
     # Ensemble size. 
-    data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../data/mb_q5_reacher_ensemble*31-10-2019*')
+    data_path = os.path.join(args.data_path, 'mb_q5_reacher_ensemble*31-10-2019*')
     data_path = glob(os.path.join(data_path, 'events.out.tfevents*'))
 
     legend = []
@@ -134,7 +135,7 @@ def p4():
     plt.close()
 
     # Number of action sequences. 
-    data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../data/mb_q5_reacher_numseq*31-10-2019*')
+    data_path = os.path.join(args.data_path, 'mb_q5_reacher_numseq*31-10-2019*')
     data_path = glob(os.path.join(data_path, 'events.out.tfevents*'))
 
     legend = []
@@ -161,7 +162,7 @@ def p4():
     plt.close()
 
     # Number of candidate action sequences. 
-    data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../data/mb_q5_reacher_horizon*31-10-2019*')
+    data_path = os.path.join(args.data_path, 'mb_q5_reacher_horizon*31-10-2019*')
     data_path = glob(os.path.join(data_path, 'events.out.tfevents*'))
 
     legend = []
@@ -192,8 +193,8 @@ if __name__ == '__main__':
     args = parse_args()
 
     if args.problem == 2: 
-        p2()
+        p2(args)
     elif args.problem == 3:
-        p3()
+        p3(args)
     elif args.problem == 4: 
-        p4()
+        p4(args)
