@@ -108,8 +108,7 @@ class RBF(Density_Model):
                 self.means: np array (B, ob_dim)
         """
         B, ob_dim = len(data), len(data[0])
-        raise NotImplementedError
-        self.means = None
+        self.means = np.asarray(data)
         assert self.means.shape == (B, ob_dim)
 
     def get_prob(self, states):
@@ -148,19 +147,23 @@ class RBF(Density_Model):
             assert states.ndim == self.means.ndim and ob_dim == replay_dim
 
             # 1. Compute deltas
-            deltas = TODO
+            deltas = np.zeros([b,B,ob_dim])
+
+            for i in range(len(states)):
+                deltas[i] = self.means - states[i]
+
             assert deltas.shape == (b, B, ob_dim)
 
             # 2. Euclidean distance
-            euc_dists = TODO
+            euc_dists = np.sum(deltas ** 2, axis=-1)
             assert euc_dists.shape == (b, B)
 
             # Gaussian
-            gaussians = TODO
+            gaussians = np.exp(-euc_dists / (2 * (self.sigma ** 2)))
             assert gaussians.shape == (b, B)
 
             # 4. Average
-            densities = TODO
+            densities = np.sum(gaussians, axis=-1) / B
             assert densities.shape == (b,)
 
             return densities
@@ -202,10 +205,12 @@ class Exemplar(Density_Model):
         self.encoder1, self.encoder2, self.prior, self.discriminator = self.forward_pass(self.state1, self.state2)
         self.discrim_target = tf.placeholder(shape=[None, 1], name="discrim_target", dtype=tf.float32)
 
-        raise NotImplementedError
-        self.log_likelihood = None
-        self.likelihood = None
-        self.kl = None
+        self.log_likelihood = tf.squeeze(self.discriminator.log_prob(self.discrim_target))
+        self.likelihood = tf.squeeze(self.discriminator.prob(self.discrim_target))
+
+        self.kl = tfp.distributions.kl_divergence(self.encoder1, self.prior)
+        self.kl += tfp.distributions.kl_divergence(self.encoder2, self.prior)
+        
         assert len(self.log_likelihood.shape) == len(self.likelihood.shape) == len(self.kl.shape) == 1
 
         raise NotImplementedError
@@ -238,8 +243,8 @@ class Exemplar(Density_Model):
 
             Hint: use build_mlp
         """
-        z_mean = TODO 
-        z_logstd = TODO
+        z_mean = build_mlp(state, z_size, scope, n_layers, hid_size)
+        z_logstd = tf.Variable(tf.zeros((z_size,))) 
         return tfp.distributions.MultivariateNormalDiag(loc=z_mean, scale_diag=tf.exp(z_logstd))
 
     def make_prior(self, z_size):
@@ -254,8 +259,8 @@ class Exemplar(Density_Model):
                 prior_mean and prior_logstd are for a standard normal distribution
                     both have dimension z_size
         """
-        prior_mean = TODO 
-        prior_logstd = TODO 
+        prior_mean = tf.zeros((z_size,))
+        prior_logstd = tf.zeros((z_size,))
         return tfp.distributions.MultivariateNormalDiag(loc=prior_mean, scale_diag=tf.exp(prior_logstd))
 
     def make_discriminator(self, z, output_size, scope, n_layers, hid_size):
@@ -277,7 +282,7 @@ class Exemplar(Density_Model):
 
             Hint: use build_mlp
         """
-        logit = TODO 
+        logit = build_mlp(z, output_size, scope, n_layers, hid_size)
         return tfp.distributions.Bernoulli(logit)
 
     def forward_pass(self, state1, state2):
@@ -315,9 +320,9 @@ class Exemplar(Density_Model):
         prior = self.make_prior(self.hid_dim/2)
 
         # Sampled Latent
-        z1 = TODO
-        z2 = TODO
-        z = TODO
+        z1 = encoder1.sample()
+        z2 = encoder2.sample()
+        z = tf.concat([z1, z2], axis=-1)
 
         # Discriminator
         discriminator = make_discriminator(z, 1, 'discriminator', n_layers=2, hid_size=self.hid_dim)

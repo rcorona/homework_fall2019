@@ -535,8 +535,8 @@ def train_AC(
             # 1. Fit density model
             if dm == 'ex2':
                 ### PROBLEM 3
-                ### YOUR CODE HERE
-                raise NotImplementedError
+                ### YOUR CODE HERE # TODO Should it be next_ob_no, or ob_no???
+                ll, kl, elbo = exploration.fit_density_model(next_ob_no)
             elif dm == 'hist' or dm == 'rbf':
                 ### PROBLEM 1
                 ### YOUR CODE HERE
